@@ -16,7 +16,7 @@ namespace GamesLog
         public Guid Id { get; set; }
         public string Ad { get; set; }
         public decimal QiymetAzn { get; set; }
-        public bool IsOrtalamaQiymet { get; set; } // Ortalama (təxmini) qiymət olub-olmamasını saxlayır
+        public bool IsOrtalamaQiymet { get; set; }
         public DateTime? AlinmaTarixi { get; set; }
         public decimal SatisQiymetiAzn { get; set; }
         public DateTime? SatisTarixi { get; set; }
@@ -256,7 +256,7 @@ namespace GamesLog
 
         private TextBox txtAd;
         private NumericUpDown numQiymet;
-        private CheckBox chkOrtalamaQiymet; // Yeni: Ortalama qiymət checkboxu
+        private CheckBox chkOrtalamaQiymet;
         private DateTimePicker dtpTarix;
         private CheckBox chkNamelumTarix;
         private NumericUpDown numSatisQiymeti;
@@ -291,7 +291,6 @@ namespace GamesLog
             CedveliYenile();
             FormuTemizle();
 
-            // Açılışda sətrin seçilməsini bloklamaq üçün qoruma
             this.BeginInvoke((MethodInvoker)delegate {
                 dgvOyunlar.ClearSelection();
             });
@@ -299,7 +298,7 @@ namespace GamesLog
 
         private void InitializeComponent()
         {
-            this.Text = "Oyun Kitabçası — Satış və Alış İdarəetməsi";
+            this.Text = "Oyun Kitabçası — Şəxsi Oyun Kolleksiyası"; // Başlıq dəyişdirildi
             this.Size = new Size(1180, 840);
             this.MinimumSize = new Size(1000, 620);
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -334,8 +333,8 @@ namespace GamesLog
             pnlSol.Controls.Add(txtAd);
             y += inputSpacing;
 
-            // 2. Alış qiyməti
-            pnlSol.Controls.Add(CreateLabel("Alış qiyməti (AZN):", 16, y));
+            // 2. Alınma qiyməti (Kolleksiya ruhuna uyğun dəyişdirildi)
+            pnlSol.Controls.Add(CreateLabel("Alınma qiyməti (AZN):", 16, y));
             numQiymet = new NumericUpDown
             {
                 Location = new Point(16, y + 22),
@@ -346,7 +345,7 @@ namespace GamesLog
                 Increment = 1
             };
             pnlSol.Controls.Add(numQiymet);
-            y += 46; // Aralıq kiçildildi çünki checkbox gəlir
+            y += 46;
 
             // Ortalama qiymət checkboxu
             chkOrtalamaQiymet = new CheckBox
@@ -526,7 +525,7 @@ namespace GamesLog
                 Dock = DockStyle.Fill,
                 Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(30, 41, 59),
-                Text = "Cəmi: 0 oyun  |  Xərc: 0.00 AZN  |  Gəlir: 0.00 AZN"
+                Text = "Cəmi: 0 oyun  |  Kolleksiyaya xərclənən: 0.00 AZN  |  Satışlardan gələn: 0.00 AZN" // Statistika mətnləri dəyişdirildi
             };
             pnlAlt.Controls.Add(lblStatistika);
 
@@ -671,7 +670,7 @@ namespace GamesLog
                     case "Ad":
                         siralanmisQuery = _sortAscending ? filtirlenmis.OrderBy(o => o.Ad) : filtirlenmis.OrderByDescending(o => o.Ad);
                         break;
-                    case "QiymetGosterisi": // Virtual column for sorting price
+                    case "QiymetGosterisi":
                         siralanmisQuery = _sortAscending ? filtirlenmis.OrderBy(o => o.QiymetAzn) : filtirlenmis.OrderByDescending(o => o.QiymetAzn);
                         break;
                     case "AlinmaTarixi":
@@ -699,7 +698,7 @@ namespace GamesLog
                     {
                         o.Id,
                         Ad = o.Ad,
-                        QiymetGosterisi = o.QiymetAzn.ToString("0.00") + " AZN" + (o.IsOrtalamaQiymet ? " (Ort.)" : ""), // Təxmini qiymət işarəsi
+                        QiymetGosterisi = o.QiymetAzn.ToString("0.00") + " AZN" + (o.IsOrtalamaQiymet ? " (Ort.)" : ""),
                         AlinmaTarixi = o.AlinmaTarixi.HasValue ? o.AlinmaTarixi.Value.ToString("dd.MM.yyyy") : "Bilinmir",
                         SatisQiymetiAzn = o.SatisQiymetiAzn > 0 ? o.SatisQiymetiAzn.ToString("0.00") + " AZN" : "-",
                         SatisTarixi = o.SatisTarixi.HasValue ? o.SatisTarixi.Value.ToString("dd.MM.yyyy") : "-",
@@ -716,7 +715,7 @@ namespace GamesLog
                 if (dgvOyunlar.Columns["Ad"] != null)
                     dgvOyunlar.Columns["Ad"].HeaderText = "Oyun adı";
                 if (dgvOyunlar.Columns["QiymetGosterisi"] != null)
-                    dgvOyunlar.Columns["QiymetGosterisi"].HeaderText = "Alış qiyməti";
+                    dgvOyunlar.Columns["QiymetGosterisi"].HeaderText = "Alınma qiyməti"; // Cədvəl başlığı dəyişdirildi
                 if (dgvOyunlar.Columns["AlinmaTarixi"] != null)
                     dgvOyunlar.Columns["AlinmaTarixi"].HeaderText = "Alınma tarixi";
                 if (dgvOyunlar.Columns["SatisQiymetiAzn"] != null)
@@ -732,13 +731,13 @@ namespace GamesLog
 
                 decimal umumiXerc = _oyunlar.Sum(o => o.QiymetAzn);
                 decimal umumiGelir = _oyunlar.Sum(o => o.SatisQiymetiAzn);
-                lblStatistika.Text = string.Format("Cəmi: {0} oyun  |  Xərc: {1:0.00} AZN  |  Gəlir: {2:0.00} AZN",
+                lblStatistika.Text = string.Format("Cəmi: {0} oyun  |  Kolleksiyaya xərclənən: {1:0.00} AZN  |  Satışlardan gələn: {2:0.00} AZN",
                     _oyunlar.Count, umumiXerc, umumiGelir);
             }
             finally
             {
                 _cedvelYenilenir = false;
-                dgvOyunlar.ClearSelection(); // Hər yeniləmədə seçimi təmizləyir
+                dgvOyunlar.ClearSelection();
             }
         }
 
@@ -755,7 +754,7 @@ namespace GamesLog
             {
                 Ad = txtAd.Text.Trim(),
                 QiymetAzn = numQiymet.Value,
-                IsOrtalamaQiymet = chkOrtalamaQiymet.Checked, // Ortalama qiymət oxunur
+                IsOrtalamaQiymet = chkOrtalamaQiymet.Checked,
                 AlinmaTarixi = chkNamelumTarix.Checked ? (DateTime?)null : dtpTarix.Value.Date,
                 SatisQiymetiAzn = chkSatilib.Checked ? numSatisQiymeti.Value : 0m,
                 SatisTarixi = chkSatilib.Checked ? (DateTime?)dtpSatisTarixi.Value.Date : null,
@@ -828,7 +827,7 @@ namespace GamesLog
                         if (qiymet > numQiymet.Maximum) qiymet = numQiymet.Maximum;
                         numQiymet.Value = qiymet;
 
-                        chkOrtalamaQiymet.Checked = oyun.IsOrtalamaQiymet; // Ortalama qiyməti bərpa edir
+                        chkOrtalamaQiymet.Checked = oyun.IsOrtalamaQiymet;
 
                         if (oyun.AlinmaTarixi.HasValue)
                         {
@@ -875,7 +874,7 @@ namespace GamesLog
             _secilmisOyunId = null;
             txtAd.Clear();
             numQiymet.Value = 0;
-            chkOrtalamaQiymet.Checked = false; // Temizləyir
+            chkOrtalamaQiymet.Checked = false;
             dtpTarix.Value = DateTime.Today;
             chkNamelumTarix.Checked = false;
             numSatisQiymeti.Value = 0;
