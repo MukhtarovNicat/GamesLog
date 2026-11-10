@@ -432,7 +432,7 @@ namespace GamesLog
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             cmbPlatforma.Items.AddRange(new object[] {
-                "PlayStation 4", "PlayStation 3", "PlayStation 2", "PSP"
+                "PlayStation 4", "PlayStation 3", "PlayStation 2", "PlayStation 1", "PSP"
             });
             cmbPlatforma.SelectedIndex = 0;
             pnlSol.Controls.Add(cmbPlatforma);
